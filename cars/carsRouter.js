@@ -25,6 +25,18 @@ router.post('/', validateCar, async ( req, res ) => {
   }
 })
 
+router.put('/:id', validateCarId, async ( req, res) => {
+  const {id} = req.params
+  try {
+    const update = await db('cars').where({id}).update(req.body)
+    const updatedCar = await db('cars').where({id})
+    res.status(201).json({ message: "Successfully Updated Car", updatedCar: updatedCar})
+  }
+  catch(error) {
+    res.status(500).json({ message: "Could Not Update Car", error: error })
+  }
+})
+
 //validation middleware
 
 function validateCar( req, res, next ) {
@@ -40,6 +52,21 @@ function validateCar( req, res, next ) {
   } else {
     req.car = body
     next()
+  }
+}
+
+async function validateCarId( req, res, next ) {
+  const {id} = req.params
+  try {
+    const car = await db('cars').where({id})
+    if(car.length) {
+      next()
+    } else {
+      res.status(404).json({ message: `Could Not Find Car with ID ${id}`})
+    }
+  }
+  catch(error) {
+    res.status(500).json({ message: "Error with validateCarId", error: error })
   }
 }
 
