@@ -37,6 +37,18 @@ router.put('/:id', validateCarId, async ( req, res) => {
   }
 })
 
+router.delete('/:id', validateCarId, async ( req, res ) => {
+  const { id } = req.params
+  try {
+    const deletedCar = await db('cars').where({id})
+    const del = await db('cars').where({id}).del()
+    res.status(201).json({ message: "Successfully Deleted Car", deletedCar: deletedCar })
+  }
+  catch(error) {
+    res.status(500).json({ message: "Could Not Delete Car", error: error })
+  }
+})
+
 //validation middleware
 
 function validateCar( req, res, next ) {
